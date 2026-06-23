@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# Environment Variables
+.env
+
+# Pytest
+.pytest_cache/
+
+# Playwright
+playwright-report/
+test-results/
+
+# Allure
+allure-results/
+allure-report/
+reports/allure-results/
+reports/allure-report/
+
+# Screenshots
+screenshots/*.png
+
+# Videos
+videos/*.webm
+videos/*.mp4
+
+# Traces
+traces/*.zip
+traces/*.trace
+
+# Logs
+logs/
+*.log
+
+# Coverage
+htmlcov/
+.coverage
+
+# OS
+.DS_Store
+Thumbs.db
