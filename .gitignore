@@ -24,13 +24,15 @@ playwright-report/
 test-results/
 
 # Allure
+tests/ui/reports/allure-results/*
 allure-results/
 allure-report/
 reports/allure-results/
 reports/allure-report/
 
 # Screenshots
-screenshots/*.png
+tests/ui/screenshots/*.png
+
 
 # Videos
 videos/*.webm
