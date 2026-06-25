@@ -35,4 +35,14 @@ This repository contains an enterprise-focused test automation framework being b
 - Allure reporting
 - Containerized execution
 
+## Project Update
+
+### 2026-06-25
+
+The initial target application (OpenProject demo) was discontinued and its public demo endpoint became unavailable.
+
+To ensure long-term stability and maintainability, the framework is being migrated to the OrangeHRM demo application.
+
+This change affects only the application under test. The framework architecture, tooling, and roadmap remain unchanged.
+
 More updates coming soon.

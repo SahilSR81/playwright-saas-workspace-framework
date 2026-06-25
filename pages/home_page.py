@@ -5,6 +5,7 @@ class HomePage:
         self.page = page
 
     def navigate(self):
+        logger.info("Navigating to home page")
         self.page.goto("https://playwright.dev/")
 
     def get_title(self):
