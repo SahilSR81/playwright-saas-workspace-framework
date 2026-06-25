@@ -1,15 +1,19 @@
 import pytest
+from utils.logger import logger
 from playwright.sync_api import sync_playwright
 
 
 @pytest.fixture
 def page():
     with sync_playwright() as p:
+        logger.info("Launching browser")
+
         browser = p.chromium.launch(headless=False)
 
         page = browser.new_page()
 
         yield page
+        logger.info("Closing browser")
 
         browser.close()
 

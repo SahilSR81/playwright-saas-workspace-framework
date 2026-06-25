@@ -1,5 +1,5 @@
 from pages.login_page import LoginPage
-from utils.config_reader import BASE_URL
+from config.settings import BASE_URL
 
 
 def test_login_page_navigation(page):

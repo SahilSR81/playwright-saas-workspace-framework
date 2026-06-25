@@ -1,5 +1,5 @@
 from pages.base_page import BasePage
-from utils.config_reader import BASE_URL
+from config.settings import BASE_URL
 
 
 def test_base_page_navigation(page):
