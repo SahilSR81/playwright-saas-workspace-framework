@@ -4,17 +4,17 @@ from config.settings import BASE_URL
 
 def test_base_page_navigation(page):
 
-    base_page = BasePage(page)
+    base = BasePage(page)
 
-    base_page.navigate(BASE_URL)
+    base.navigate(BASE_URL)
 
-    assert BASE_URL.split("/")[2] in base_page.get_url()
+    assert "orangehrmlive" in base.get_current_url().lower()
 
 
 def test_base_page_title(page):
 
-    base_page = BasePage(page)
+    base = BasePage(page)
 
-    base_page.navigate(BASE_URL)
+    base.navigate(BASE_URL)
 
-    assert len(base_page.get_title()) > 0
+    assert "OrangeHRM" in base.get_title()

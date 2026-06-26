@@ -1,37 +1,36 @@
 from pages.login_page import LoginPage
-from config.settings import BASE_URL
 
 
-def test_login_page_navigation(page):
+def test_login_page_load(page):
 
-    login_page = LoginPage(page)
+    login = LoginPage(page)
 
-    login_page.navigate()
+    login.navigate()
 
-    assert BASE_URL in page.url
-
-
-def test_login_page_title_is_not_empty(page):
-
-    login_page = LoginPage(page)
-
-    login_page.navigate()
-
-    assert login_page.get_page_title() != ""
+    login.expect_visible(login.username_input)
+    login.expect_visible(login.password_input)
+    login.expect_visible(login.login_button)
 
 
-def test_login_page_title_contains_openproject(page):
+def test_successful_login(page):
 
-    login_page = LoginPage(page)
+    login = LoginPage(page)
 
-    login_page.navigate()
+    login.navigate()
 
-    assert "OpenProject" in login_page.get_page_title()
+    login.login()
 
-def test_login_page_url_contains_openproject(page):
+    assert "dashboard" in page.url.lower()
 
-    login_page = LoginPage(page)
 
-    login_page.navigate()
+def test_dashboard_heading_visible_after_login(page):
 
-    assert "openproject" in login_page.get_current_url().lower()
+    login = LoginPage(page)
+
+    login.navigate()
+
+    login.login()
+
+    heading = page.get_by_role("heading", name="Dashboard")
+
+    assert heading.is_visible()

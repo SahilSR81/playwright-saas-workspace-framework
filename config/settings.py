@@ -1,5 +1,4 @@
 import os
-
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,8 +9,12 @@ BROWSER = os.getenv("BROWSER", "chromium")
 
 HEADLESS = os.getenv("HEADLESS", "False").lower() == "true"
 
-SLOW_MO = int(os.getenv("SLOW_MO", 0))
+SLOW_MO = int(os.getenv("SLOW_MO", "0"))
 
-TIMEOUT = int(os.getenv("TIMEOUT", 30000))
+TIMEOUT = int(os.getenv("TIMEOUT", "30000"))
 
 ENV = os.getenv("ENV", "QA")
+
+USERNAME = os.getenv("USERNAME")
+
+PASSWORD = os.getenv("PASSWORD")
