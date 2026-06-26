@@ -35,14 +35,15 @@ This repository contains an enterprise-focused test automation framework being b
 - Allure reporting
 - Containerized execution
 
-## Project Update
+Project Update
+2026-06-26
 
-### 2026-06-25
+During the initial development phase, the framework targeted the OpenProject public demo environment. The demo endpoint later became unavailable, making it unsuitable for long-term automated testing.
 
-The initial target application (OpenProject demo) was discontinued and its public demo endpoint became unavailable.
+To ensure framework stability and continuous development, the System Under Test (SUT) has been migrated to the OrangeHRM public demo application.
 
-To ensure long-term stability and maintainability, the framework is being migrated to the OrangeHRM demo application.
+This migration only changes the target application. The framework architecture, including the Page Object Model, Pytest integration, Allure reporting, environment-based configuration, and future roadmap, remains unchanged.
 
-This change affects only the application under test. The framework architecture, tooling, and roadmap remain unchanged.
+The framework is designed to be application-agnostic, allowing future migration to other enterprise web applications with minimal changes to page objects.
 
 More updates coming soon.
