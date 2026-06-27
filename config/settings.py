@@ -1,9 +1,12 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 
-BASE_URL = os.getenv("BASE_URL")
+BASE_URL = os.getenv(
+    "BASE_URL",
+    "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+)
 
 BROWSER = os.getenv("BROWSER", "chromium")
 
@@ -15,6 +18,6 @@ TIMEOUT = int(os.getenv("TIMEOUT", "30000"))
 
 ENV = os.getenv("ENV", "QA")
 
-USERNAME = os.getenv("USERNAME")
+USERNAME = os.getenv("USERNAME", "Admin")
 
-PASSWORD = os.getenv("PASSWORD")
+PASSWORD = os.getenv("PASSWORD", "admin123")

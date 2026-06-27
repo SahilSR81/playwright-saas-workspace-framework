@@ -32,6 +32,7 @@ reports/allure-report/
 
 # Screenshots
 tests/ui/screenshots/*.png
+screenshots/*.png
 
 
 # Videos
