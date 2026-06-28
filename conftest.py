@@ -4,14 +4,17 @@ import pytest
 from playwright.sync_api import sync_playwright
 
 from config.settings import (
+    BASE_URL,
     BROWSER,
     HEADLESS,
     SLOW_MO,
 )
+from pages.login_page import LoginPage
 from utils.logger import logger
 
 
 AUTH_FILE = Path("playwright/.auth/user.json")
+DASHBOARD_URL = BASE_URL.replace("/auth/login", "/dashboard/index")
 
 
 @pytest.fixture(scope="session")
@@ -69,18 +72,17 @@ def page(context):
 @pytest.fixture
 def authenticated_page(browser):
 
-    if not AUTH_FILE.exists():
-        pytest.fail(
-            "Authentication state not found. Generate storage_state first."
-        )
-
     logger.info("Launching authenticated browser context")
 
-    context = browser.new_context(
-        storage_state=str(AUTH_FILE)
-    )
-
+    context = browser.new_context()
     page = context.new_page()
+
+    login_page = LoginPage(page)
+    login_page.navigate()
+    login_page.login()
+
+    page.goto(DASHBOARD_URL)
+    page.wait_for_load_state("networkidle")
 
     yield page
 
