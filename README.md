@@ -37,12 +37,11 @@ This repository contains an enterprise-grade test automation framework built wit
 
 ---
 
-## Project Update
+Project Update
+2026-06-29
 
-### 2026-06-28
+Implemented the Admin (System Users) module as the first complete enterprise business workflow within the framework.
 
-Expanded the authenticated automation framework by implementing the Dashboard, Sidebar Navigation, and Logout modules for the OrangeHRM demo application.
-
-This milestone introduces reusable page objects, authenticated dashboard validation, navigation smoke tests, logout workflow automation, and security-focused session validation to establish a solid foundation for upcoming Admin, PIM, API, and BDD modules.
+This milestone introduces reusable page objects for the Admin module, advanced user search functionality, role and status filtering, reset operations, table validations, and comprehensive positive, negative, and edge case test coverage. The authenticated automation framework now supports end-to-end navigation from login through dashboard access to enterprise user management workflows.
 
 More updates coming soon...
