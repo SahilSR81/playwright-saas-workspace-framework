@@ -19,8 +19,8 @@ This repository contains an enterprise-grade test automation framework built wit
 * ✅ Dependency management
 * ✅ Authentication module
 * ✅ Storage state management
-* ⬜ API data seeding
-* ⬜ Network interception
+* ✅ API data seeding
+* ✅ Network interception
 * ⬜ BDD integration
 * ⬜ Docker support
 * ⬜ CI/CD pipeline
