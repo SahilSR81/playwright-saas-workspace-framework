@@ -2,8 +2,12 @@ from playwright.sync_api import expect
 
 from pages.base_page import BasePage
 from utils.logger import logger
+from config.settings import BASE_URL
 
-
+DASHBOARD_URL = BASE_URL.replace(
+    "/auth/login",
+    "/dashboard/index"
+)
 class DashboardPage(BasePage):
 
     def __init__(self, page):
@@ -28,6 +32,14 @@ class DashboardPage(BasePage):
         self.time_at_work = page.get_by_text("Time at Work")
 
         self.my_actions = page.get_by_text("My Actions")
+
+    def navigate(self):
+
+        logger.info("Navigating to Dashboard")
+
+        super().navigate(DASHBOARD_URL)
+
+        self.wait_for_page_load()
 
     def is_dashboard_loaded(self):
         logger.info("Checking Dashboard page")
