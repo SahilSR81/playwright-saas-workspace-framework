@@ -4,7 +4,7 @@ from api.employee_api import EmployeeAPI
 
 
 @pytest.fixture
-def employee_api():
+def employee_api(auth_storage_state):
 
     api = EmployeeAPI()
 
@@ -48,9 +48,6 @@ def test_employee_api_object(employee_api):
     assert isinstance(employee_api, EmployeeAPI)
 
 
-@pytest.mark.skip(
-    reason="Requires authenticated OrangeHRM API session"
-)
 def test_get_all_employees(employee_api):
 
     response = employee_api.get_all_employees()
@@ -58,9 +55,6 @@ def test_get_all_employees(employee_api):
     assert response.status_code == 200
 
 
-@pytest.mark.skip(
-    reason="Requires authenticated OrangeHRM API session"
-)
 def test_create_employee(employee_api):
 
     response = employee_api.create_employee(

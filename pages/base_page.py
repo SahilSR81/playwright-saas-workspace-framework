@@ -13,23 +13,23 @@ class BasePage:
     def get_title(self):
         logger.info("Getting page title")
         return self.page.title()
-    
-    logger.info("Getting page title")
+
     def get_current_url(self):
+        logger.info("Getting current URL")
         return self.page.url
 
-    logger.info("Getting current URL")
     def wait_for_page_load(self):
+        logger.info("Waiting for page to load")
         self.page.wait_for_load_state("networkidle")
 
-    logger.info("Waiting for page to load")
     def click(self, locator):
+        logger.info("Clicking on locator")
         locator.click()
 
-    logger.info("Clicking on locator")
     def fill(self, locator, text):
+        logger.info("Filling locator with text")
         locator.fill(text)
 
-    logger.info("Filling locator with text")
     def expect_visible(self, locator):
+        logger.info("Expecting locator to be visible")
         expect(locator).to_be_visible()

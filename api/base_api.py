@@ -22,8 +22,34 @@ class BaseAPI:
         }
 
         self.session.headers.update(self.default_headers)
+        self._load_cookies_from_storage_state()
 
         logger.info("API Session initialized")
+
+    def _load_cookies_from_storage_state(self):
+        from pathlib import Path
+        import json
+
+        storage_path = Path("playwright/.auth/user.json")
+        if storage_path.exists():
+            logger.info("Loading cookies from Playwright storage state: %s", storage_path)
+            try:
+                with open(storage_path, "r") as f:
+                    state = json.load(f)
+
+                cookies = state.get("cookies", [])
+                for cookie in cookies:
+                    self.session.cookies.set(
+                        name=cookie["name"],
+                        value=cookie["value"],
+                        domain=cookie.get("domain", ""),
+                        path=cookie.get("path", "/")
+                    )
+                logger.info("Successfully loaded %d cookies from storage state", len(cookies))
+            except Exception as e:
+                logger.error("Failed to load cookies from storage state: %s", e)
+        else:
+            logger.warning("Playwright storage state file not found. API session will be unauthenticated.")
 
     def get(self, endpoint, **kwargs):
 

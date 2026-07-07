@@ -69,10 +69,14 @@ def page(context):
     page.close()
 
 
-@pytest.fixture
-def authenticated_page(browser):
-
-    logger.info("Launching authenticated browser context")
+@pytest.fixture(scope="session")
+def auth_storage_state(browser):
+    """
+    Session-scoped fixture to perform login once and save the storage state.
+    All tests requiring authentication will reuse this state.
+    """
+    logger.info("Setting up authenticated session storage state")
+    AUTH_FILE.parent.mkdir(parents=True, exist_ok=True)
 
     context = browser.new_context()
     page = context.new_page()
@@ -80,6 +84,21 @@ def authenticated_page(browser):
     login_page = LoginPage(page)
     login_page.navigate()
     login_page.login()
+
+    context.storage_state(path=str(AUTH_FILE))
+    logger.info("Saved storage state to %s", AUTH_FILE)
+
+    context.close()
+    yield AUTH_FILE
+
+
+@pytest.fixture
+def authenticated_page(browser, auth_storage_state):
+
+    logger.info("Launching authenticated browser context using cached storage state")
+
+    context = browser.new_context(storage_state=str(auth_storage_state))
+    page = context.new_page()
 
     page.goto(DASHBOARD_URL)
     page.wait_for_load_state("networkidle")
