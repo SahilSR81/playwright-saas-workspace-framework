@@ -1,0 +1,32 @@
+[
+  {
+    "name": "UI Element Failure",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": ".*(element not found|no such element|unable to locate|visible|clickable|interactable|not found).*"
+  },
+  {
+    "name": "Locator Failure",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": ".*(strict mode violation|locator|engine=\\\"(xpath|css|text)\\\"|selector).*"
+  },
+  {
+    "name": "Assertion Failure",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*(assertion|AssertionError|expected|actual|to contain|to equal|to be truthy|to be falsy).*"
+  },
+  {
+    "name": "Network Failure",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": ".*(net::|ERR_|ECONNREFUSED|ENOTFOUND|request failed|status \\d{3}|network).*"
+  },
+  {
+    "name": "Timeout Failure",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": ".*(TimeoutError|timeout \\d+|timed out|exceeded|Timeout \\d+).*"
+  },
+  {
+    "name": "API Failure",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": ".*(API|api|status_code|response_code|\\\"status\\\":\\s*[45]\\d{2}|4\\d{2}|5\\d{2}).*"
+  }
+]
