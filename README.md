@@ -21,6 +21,7 @@ This repository contains an enterprise-grade test automation framework built wit
 * ✅ Storage state management
 * ✅ API data seeding
 * ✅ Network interception
+* ✅ Allure diagnostics & failure artifacts
 * ⬜ BDD integration
 * ⬜ Docker support
 * ⬜ CI/CD pipeline
@@ -39,8 +40,8 @@ This repository contains an enterprise-grade test automation framework built wit
 
 ## Project Update
 
-### 2026-07-04
+### 2026-07-08
 
-Expanded the framework by introducing Playwright's network interception capabilities. This milestone adds reusable request routing utilities, mocked API responses, asset blocking, and offline network simulation to improve test reliability and validate application behavior under different network conditions.
+Enhanced the reporting infrastructure by extending Allure with richer failure diagnostics and execution metadata. Test failures now capture additional debugging artifacts, improving traceability and simplifying root cause analysis across UI and API automation workflows.
 
 More updates coming soon...
