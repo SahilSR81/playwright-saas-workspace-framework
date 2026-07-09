@@ -1,7 +1,10 @@
+import pytest
+
 from config.settings import USERNAME, PASSWORD
 from pages.login_page import LoginPage
 
 
+@pytest.mark.smoke
 def test_login_page_load(page):
 
     login = LoginPage(page)
@@ -13,6 +16,7 @@ def test_login_page_load(page):
     login.expect_visible(login.login_button)
 
 
+@pytest.mark.smoke
 def test_successful_login(page):
 
     login = LoginPage(page)
@@ -24,6 +28,7 @@ def test_successful_login(page):
     assert "dashboard" in page.url.lower()
 
 
+@pytest.mark.regression
 def test_dashboard_heading_visible_after_login(page):
 
     login = LoginPage(page)
@@ -38,6 +43,7 @@ def test_dashboard_heading_visible_after_login(page):
     assert heading.is_visible()
 
 
+@pytest.mark.regression
 def test_invalid_password(page):
 
     login = LoginPage(page)
@@ -49,6 +55,7 @@ def test_invalid_password(page):
     assert "Invalid credentials" in login.get_invalid_credentials_text()
 
 
+@pytest.mark.regression
 def test_invalid_username(page):
 
     login = LoginPage(page)
@@ -60,6 +67,7 @@ def test_invalid_username(page):
     assert "Invalid credentials" in login.get_invalid_credentials_text()
 
 
+@pytest.mark.regression
 def test_empty_username(page):
 
     login = LoginPage(page)
@@ -71,6 +79,7 @@ def test_empty_username(page):
     assert login.required_field_count() >= 1
 
 
+@pytest.mark.regression
 def test_empty_password(page):
 
     login = LoginPage(page)
@@ -82,6 +91,7 @@ def test_empty_password(page):
     assert login.required_field_count() >= 1
 
 
+@pytest.mark.regression
 def test_empty_credentials(page):
 
     login = LoginPage(page)
@@ -93,6 +103,7 @@ def test_empty_credentials(page):
     assert login.required_field_count() == 2
 
 
+@pytest.mark.regression
 def test_whitespace_credentials(page):
 
     login = LoginPage(page)
@@ -104,6 +115,7 @@ def test_whitespace_credentials(page):
     assert login.required_field_count() >= 1
 
 
+@pytest.mark.regression
 def test_username_case_sensitivity(page):
 
     login = LoginPage(page)

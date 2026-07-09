@@ -11,6 +11,7 @@ SAMPLE_INVALID_FILE_PATH = os.path.join("data", "sample_invalid.txt")
 
 # ---------- Happy Path: Add Employee ----------
 
+@pytest.mark.smoke
 def test_navigate_to_pim(authenticated_page):
 
     pim = PimPage(authenticated_page)
@@ -20,6 +21,7 @@ def test_navigate_to_pim(authenticated_page):
     assert pim.is_pim_page_loaded()
 
 
+@pytest.mark.smoke
 def test_add_employee_button_visible(authenticated_page):
 
     pim = PimPage(authenticated_page)
@@ -29,6 +31,7 @@ def test_add_employee_button_visible(authenticated_page):
     pim.expect_visible(pim.add_button)
 
 
+@pytest.mark.smoke
 def test_add_employee_success(authenticated_page):
 
     pim = PimPage(authenticated_page)
@@ -42,6 +45,7 @@ def test_add_employee_success(authenticated_page):
     assert pim.is_employee_added()
 
 
+@pytest.mark.regression
 def test_add_employee_with_middle_name(authenticated_page):
 
     pim = PimPage(authenticated_page)
@@ -57,6 +61,7 @@ def test_add_employee_with_middle_name(authenticated_page):
     assert pim.is_employee_added()
 
 
+@pytest.mark.regression
 def test_employee_id_auto_generated(authenticated_page):
 
     pim = PimPage(authenticated_page)
@@ -71,6 +76,7 @@ def test_employee_id_auto_generated(authenticated_page):
 
 # ---------- Employee Search ----------
 
+@pytest.mark.regression
 def test_search_employee_by_name(authenticated_page):
 
     pim = PimPage(authenticated_page)
@@ -81,6 +87,7 @@ def test_search_employee_by_name(authenticated_page):
     assert pim.get_results_count() >= 1
 
 
+@pytest.mark.regression
 def test_search_employee_by_id(authenticated_page):
 
     pim = PimPage(authenticated_page)
@@ -91,6 +98,7 @@ def test_search_employee_by_id(authenticated_page):
     assert pim.is_table_loaded()
 
 
+@pytest.mark.regression
 def test_search_no_results(authenticated_page):
 
     pim = PimPage(authenticated_page)
@@ -101,6 +109,7 @@ def test_search_no_results(authenticated_page):
     assert pim.is_no_record_found()
 
 
+@pytest.mark.regression
 def test_reset_search_filters(authenticated_page):
 
     pim = PimPage(authenticated_page)
@@ -117,6 +126,7 @@ def test_reset_search_filters(authenticated_page):
 
 # ---------- Edit Employee ----------
 
+@pytest.mark.regression
 def test_edit_employee_first_name(authenticated_page):
 
     pim = PimPage(authenticated_page)
@@ -131,6 +141,7 @@ def test_edit_employee_first_name(authenticated_page):
     assert pim.get_first_name_value() == "AdminEdited"
 
 
+@pytest.mark.regression
 def test_edit_employee_save_persists(authenticated_page):
 
     pim = PimPage(authenticated_page)
@@ -150,6 +161,7 @@ def test_edit_employee_save_persists(authenticated_page):
 
 # ---------- Delete Employee ----------
 
+@pytest.mark.regression
 def test_delete_employee_confirmation_dialog(authenticated_page):
 
     pim = PimPage(authenticated_page)
@@ -161,6 +173,7 @@ def test_delete_employee_confirmation_dialog(authenticated_page):
     assert pim.is_delete_confirmation_visible()
 
 
+@pytest.mark.regression
 def test_delete_employee_success(authenticated_page):
 
     pim = PimPage(authenticated_page)
@@ -184,6 +197,7 @@ def test_delete_employee_success(authenticated_page):
     not os.path.exists(SAMPLE_IMAGE_PATH),
     reason="Sample profile image not found in data/ folder",
 )
+@pytest.mark.integration
 def test_upload_profile_image(authenticated_page):
 
     pim = PimPage(authenticated_page)
@@ -202,6 +216,7 @@ def test_upload_profile_image(authenticated_page):
     not os.path.exists(SAMPLE_INVALID_FILE_PATH),
     reason="Sample invalid file not found in data/ folder",
 )
+@pytest.mark.integration
 def test_upload_invalid_file_type(authenticated_page):
 
     pim = PimPage(authenticated_page)
@@ -217,6 +232,7 @@ def test_upload_invalid_file_type(authenticated_page):
 
 # ---------- Validation / Negative Scenarios ----------
 
+@pytest.mark.regression
 def test_add_employee_empty_required_fields(authenticated_page):
 
     pim = PimPage(authenticated_page)
@@ -229,6 +245,7 @@ def test_add_employee_empty_required_fields(authenticated_page):
     assert pim.required_field_count() >= 1
 
 
+@pytest.mark.regression
 def test_add_employee_special_characters_in_name(authenticated_page):
 
     pim = PimPage(authenticated_page)
@@ -242,6 +259,7 @@ def test_add_employee_special_characters_in_name(authenticated_page):
     assert pim.required_field_count() >= 1 or pim.is_employee_added()
 
 
+@pytest.mark.regression
 def test_search_special_characters(authenticated_page):
 
     pim = PimPage(authenticated_page)
@@ -254,6 +272,7 @@ def test_search_special_characters(authenticated_page):
 
 # ---------- Edge Cases ----------
 
+@pytest.mark.regression
 def test_add_employee_long_name(authenticated_page):
 
     pim = PimPage(authenticated_page)
@@ -269,6 +288,7 @@ def test_add_employee_long_name(authenticated_page):
     assert pim.is_employee_added() or pim.required_field_count() >= 1
 
 
+@pytest.mark.regression
 def test_search_leading_trailing_spaces(authenticated_page):
 
     pim = PimPage(authenticated_page)

@@ -21,3 +21,7 @@ ENV = os.getenv("ENV", "QA")
 USERNAME = os.getenv("USERNAME", "Admin")
 
 PASSWORD = os.getenv("PASSWORD", "admin123")
+
+BROWSERS = os.getenv("BROWSERS", "chromium,firefox,webkit").split(",")
+
+PARALLEL_WORKERS = int(os.getenv("PARALLEL_WORKERS", "0"))

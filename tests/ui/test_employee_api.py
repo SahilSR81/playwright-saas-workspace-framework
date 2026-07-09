@@ -13,6 +13,7 @@ def employee_api(auth_storage_state):
     api.close()
 
 
+@pytest.mark.api
 def test_employee_endpoint():
 
     api = EmployeeAPI()
@@ -20,6 +21,7 @@ def test_employee_endpoint():
     assert api.EMPLOYEE_ENDPOINT == "/web/index.php/api/v2/pim/employees"
 
 
+@pytest.mark.api
 def test_create_employee_payload(employee_api):
 
     payload = {
@@ -32,6 +34,7 @@ def test_create_employee_payload(employee_api):
     assert payload["lastName"] == "Singh"
 
 
+@pytest.mark.api
 def test_create_employee_with_custom_employee_id(employee_api):
 
     payload = {
@@ -43,11 +46,13 @@ def test_create_employee_with_custom_employee_id(employee_api):
     assert payload["employeeId"] == "EMP1001"
 
 
+@pytest.mark.api
 def test_employee_api_object(employee_api):
 
     assert isinstance(employee_api, EmployeeAPI)
 
 
+@pytest.mark.api
 def test_get_all_employees(employee_api):
 
     response = employee_api.get_all_employees()
@@ -55,6 +60,7 @@ def test_get_all_employees(employee_api):
     assert response.status_code == 200
 
 
+@pytest.mark.api
 def test_create_employee(employee_api):
 
     response = employee_api.create_employee(

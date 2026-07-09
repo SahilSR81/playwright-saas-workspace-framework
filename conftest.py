@@ -1,3 +1,4 @@
+import os
 import platform
 import sys
 from datetime import datetime
@@ -9,16 +10,30 @@ from playwright.sync_api import sync_playwright
 from config.settings import (
     BASE_URL,
     BROWSER,
+    BROWSERS,
     ENV,
     HEADLESS,
+    PARALLEL_WORKERS,
     SLOW_MO,
 )
 from pages.login_page import LoginPage
 from utils.logger import logger
 
 
-AUTH_FILE = Path("playwright/.auth/user.json")
+AUTH_DIR = Path("playwright/.auth")
 DASHBOARD_URL = BASE_URL.replace("/auth/login", "/dashboard/index")
+
+
+def _get_worker_id():
+    worker = os.environ.get("PYTEST_XDIST_WORKER", None)
+    if worker:
+        return worker
+    return "master"
+
+
+def _get_worker_auth_path(worker_id):
+    AUTH_DIR.mkdir(parents=True, exist_ok=True)
+    return AUTH_DIR / f"{worker_id}.json"
 
 
 @pytest.fixture(scope="session")
@@ -86,11 +101,18 @@ def page(context):
 @pytest.fixture(scope="session")
 def auth_storage_state(browser):
     """
-    Session-scoped fixture to perform login once and save the storage state.
-    All tests requiring authentication will reuse this state.
+    Session-scoped fixture that performs login once per worker and saves
+    a separate storage state file per xdist worker to avoid conflicts.
     """
-    logger.info("Setting up authenticated session storage state")
-    AUTH_FILE.parent.mkdir(parents=True, exist_ok=True)
+    worker_id = _get_worker_id()
+    auth_path = _get_worker_auth_path(worker_id)
+
+    if auth_path.exists():
+        logger.info("Reusing existing storage state for worker %s", worker_id)
+        yield auth_path
+        return
+
+    logger.info("Setting up authenticated session for worker %s", worker_id)
 
     context = browser.new_context()
     page = context.new_page()
@@ -99,11 +121,11 @@ def auth_storage_state(browser):
     login_page.navigate()
     login_page.login()
 
-    context.storage_state(path=str(AUTH_FILE))
-    logger.info("Saved storage state to %s", AUTH_FILE)
+    context.storage_state(path=str(auth_path))
+    logger.info("Saved storage state to %s", auth_path)
 
     context.close()
-    yield AUTH_FILE
+    yield auth_path
 
 
 @pytest.fixture
@@ -133,6 +155,20 @@ def authenticated_page(browser, auth_storage_state):
     context.close()
 
 
+def pytest_configure(config):
+    config.addinivalue_line("markers", "smoke: Quick sanity checks for critical paths")
+    config.addinivalue_line("markers", "regression: Full regression test suite")
+    config.addinivalue_line("markers", "api: API-only tests")
+    config.addinivalue_line("markers", "integration: UI + API hybrid tests")
+
+
+def pytest_collection_modifyitems(config, items):
+    if PARALLEL_WORKERS > 0:
+        for item in items:
+            if "authenticated_page" in item.fixturenames:
+                item.add_marker(pytest.mark.serial)
+
+
 @pytest.fixture(scope="session", autouse=True)
 def set_allure_environment():
     reports_dir = Path("reports/allure-results")
@@ -144,6 +180,8 @@ def set_allure_environment():
     except (ImportError, Exception):
         pw_version = "Unknown"
 
+    worker_id = _get_worker_id()
+
     props = {
         "OS": f"{platform.system()} {platform.release()}",
         "Python": sys.version.split()[0],
@@ -151,6 +189,7 @@ def set_allure_environment():
         "Playwright": pw_version,
         "Framework": "Playwright SaaS Framework",
         "Environment": ENV,
+        "Worker": worker_id,
         "Execution.Time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     }
 

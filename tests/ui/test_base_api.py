@@ -1,6 +1,9 @@
+import pytest
+
 from api.base_api import BaseAPI
 
 
+@pytest.mark.api
 def test_api_session_created():
 
     api = BaseAPI()
@@ -10,6 +13,7 @@ def test_api_session_created():
     api.close()
 
 
+@pytest.mark.api
 def test_default_headers():
 
     api = BaseAPI()
@@ -19,6 +23,7 @@ def test_default_headers():
     api.close()
 
 
+@pytest.mark.api
 def test_base_url():
 
     api = BaseAPI()
@@ -28,6 +33,7 @@ def test_base_url():
     api.close()
 
 
+@pytest.mark.api
 def test_api_session_close():
 
     api = BaseAPI()

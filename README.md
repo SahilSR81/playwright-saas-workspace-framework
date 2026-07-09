@@ -1,4 +1,4 @@
-## 🚧 Project Status ![Status](https://img.shields.io/badge/status-in%20development-yellow)
+## Project Status ![Status](https://img.shields.io/badge/status-in%20development-yellow)
 
 Under Active Development
 
@@ -19,22 +19,62 @@ This repository contains an enterprise-grade test automation framework built wit
 * ✅ Dependency management
 * ✅ Authentication module
 * ✅ Storage state management
-* ✅ API data seeding
+* ✅ Dashboard module
+* ✅ Navigation module
+* ✅ Logout workflow
+* ✅ Admin module
+* ✅ PIM module
+* ✅ API framework
 * ✅ Network interception
-* ✅ Allure diagnostics & failure artifacts
+* ✅ Hybrid API + UI validation
+* ✅ Advanced Allure reporting
+* ✅ Parallel execution
 * ⬜ BDD integration
 * ⬜ Docker support
 * ⬜ CI/CD pipeline
 
-## Planned Features
+## Running Tests
 
-* UI + API hybrid testing
-* Parallel execution
-* Session persistence
-* Network mocking
-* Trace Viewer integration
-* Allure reporting
-* Containerized execution
+### Sequential (default)
+
+```bash
+pytest
+```
+
+### Parallel
+
+```bash
+# Auto-detect CPU count
+pytest -n auto
+
+# Fixed worker count
+pytest -n 4
+```
+
+### By Marker
+
+```bash
+pytest -m smoke
+pytest -m regression
+pytest -m api
+pytest -m integration
+```
+
+### Using Script
+
+```bash
+bash scripts/run_parallel.sh auto smoke
+bash scripts/run_parallel.sh 4 regression
+```
+
+## Test Markers
+
+| Marker        | Description                          |
+|---------------|--------------------------------------|
+| `smoke`       | Critical path sanity checks          |
+| `regression`  | Full regression suite                |
+| `api`         | API-only tests                       |
+| `integration` | UI + API hybrid tests                |
 
 ---
 
@@ -42,6 +82,6 @@ This repository contains an enterprise-grade test automation framework built wit
 
 ### 2026-07-08
 
-Enhanced the reporting infrastructure by extending Allure with richer failure diagnostics and execution metadata. Test failures now capture additional debugging artifacts, improving traceability and simplifying root cause analysis across UI and API automation workflows.
+Enhanced the framework with parallel test execution and improved test organization. Added support for concurrent execution using pytest-xdist, configurable browser selection, and test categorization through markers, enabling faster regression runs and better scalability for larger automation suites.
 
 More updates coming soon...
