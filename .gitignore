@@ -59,3 +59,6 @@ Thumbs.db
 # Antigravity artifacts
 project_evaluation.md
 .continue/mcpServers/*.yaml
+
+# Docker artifacts
+node_modules

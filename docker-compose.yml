@@ -1,0 +1,11 @@
+services:
+  automation:
+    build: .
+    container_name: playwright-automation
+    environment:
+      - HEADLESS=true
+    volumes:
+      - ./reports/allure-results:/app/reports/allure-results
+      - ./reports/allure-report:/app/reports/allure-report
+      - ./screenshots:/app/screenshots
+      - ./videos:/app/videos

@@ -29,8 +29,8 @@ This repository contains an enterprise-grade test automation framework built wit
 * ✅ Hybrid API + UI validation
 * ✅ Advanced Allure reporting
 * ✅ Parallel execution
+* ✅ Docker support
 * ⬜ BDD integration
-* ⬜ Docker support
 * ⬜ CI/CD pipeline
 
 ## Running Tests
@@ -67,6 +67,12 @@ bash scripts/run_parallel.sh auto smoke
 bash scripts/run_parallel.sh 4 regression
 ```
 
+### Docker
+
+```bash
+docker compose up --build
+```
+
 ## Test Markers
 
 | Marker        | Description                          |
@@ -80,8 +86,8 @@ bash scripts/run_parallel.sh 4 regression
 
 ## Project Update
 
-### 2026-07-09
+### 2026-07-10
 
-Enhanced the framework with parallel test execution and improved test organization. Added support for concurrent execution using pytest-xdist, configurable browser selection, and test categorization through markers, enabling faster regression runs and better scalability for larger automation suites.
+Containerized the automation framework using Docker to provide a consistent execution environment across development machines and CI pipelines. Added Docker configuration for dependency management, browser installation, and automated test execution, simplifying project setup and improving portability.
 
 More updates coming soon...

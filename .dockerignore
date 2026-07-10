@@ -1,0 +1,11 @@
+.git
+.venv
+__pycache__
+.pytest_cache
+allure-report
+allure-results
+screenshots
+videos
+playwright/.auth
+node_modules
+reports
