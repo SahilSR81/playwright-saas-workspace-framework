@@ -90,4 +90,8 @@ docker compose up --build
 
 Containerized the automation framework using Docker to provide a consistent execution environment across development machines and CI pipelines. Added Docker configuration for dependency management, browser installation, and automated test execution, simplifying project setup and improving portability.
 
+### 2026-06-11
+
+Improved authentication resilience across the framework. Added automatic session refresh when storage state expires during test execution, with seamless re-authentication and state syncing between worker-specific and shared storage files. Refined API cookie loading with a fallback mechanism that gracefully handles missing storage state files. Adjusted environment variable loading to respect system-level defaults.
+
 More updates coming soon...

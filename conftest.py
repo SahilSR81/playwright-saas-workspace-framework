@@ -98,22 +98,8 @@ def page(context):
     page.close()
 
 
-@pytest.fixture(scope="session")
-def auth_storage_state(browser):
-    """
-    Session-scoped fixture that performs login once per worker and saves
-    a separate storage state file per xdist worker to avoid conflicts.
-    """
-    worker_id = _get_worker_id()
-    auth_path = _get_worker_auth_path(worker_id)
-
-    if auth_path.exists():
-        logger.info("Reusing existing storage state for worker %s", worker_id)
-        yield auth_path
-        return
-
-    logger.info("Setting up authenticated session for worker %s", worker_id)
-
+def _perform_login(browser, auth_path):
+    """Helper: perform a fresh login, save storage state, return (context, page)."""
     context = browser.new_context()
     page = context.new_page()
 
@@ -124,16 +110,50 @@ def auth_storage_state(browser):
     context.storage_state(path=str(auth_path))
     logger.info("Saved storage state to %s", auth_path)
 
+    return context, page
+
+
+def _copy_storage_state(src_path, dst_path):
+    """Copy a storage state file so both worker-specific and user.json stay in sync."""
+    import shutil
+    try:
+        shutil.copy2(str(src_path), str(dst_path))
+        logger.info("Synced storage state to %s", dst_path)
+    except Exception as e:
+        logger.warning("Failed to sync storage state: %s", e)
+
+
+@pytest.fixture(scope="session")
+def auth_storage_state(browser):
+    """
+    Session-scoped fixture that performs login once per worker and saves
+    a separate storage state file per xdist worker to avoid conflicts.
+    """
+    worker_id = _get_worker_id()
+    auth_path = _get_worker_auth_path(worker_id)
+    user_json_path = AUTH_DIR / "user.json"
+
+    if auth_path.exists():
+        logger.info("Removing stale storage state for worker %s", worker_id)
+        auth_path.unlink(missing_ok=True)
+
+    logger.info("Setting up authenticated session for worker %s", worker_id)
+
+    context, page = _perform_login(browser, auth_path)
+    _copy_storage_state(auth_path, user_json_path)
+
     context.close()
     yield auth_path
 
 
 @pytest.fixture
 def authenticated_page(browser, auth_storage_state):
+    auth_path = auth_storage_state
+    user_json_path = AUTH_DIR / "user.json"
 
     logger.info("Launching authenticated browser context using cached storage state")
 
-    context = browser.new_context(storage_state=str(auth_storage_state))
+    context = browser.new_context(storage_state=str(auth_path))
     context.tracing.start(screenshots=True, snapshots=True)
     page = context.new_page()
     page.console_logs = []
@@ -143,6 +163,24 @@ def authenticated_page(browser, auth_storage_state):
 
     page.goto(DASHBOARD_URL)
     page.wait_for_load_state("networkidle")
+
+    if "/auth/login" in page.url.lower():
+        logger.warning("Storage state expired — re-authenticating")
+        context.close()
+
+        new_context, new_page = _perform_login(browser, auth_path)
+        _copy_storage_state(auth_path, user_json_path)
+        new_context.close()
+
+        context = browser.new_context(storage_state=str(auth_path))
+        context.tracing.start(screenshots=True, snapshots=True)
+        page = context.new_page()
+        page.console_logs = []
+        page.on("console", lambda msg: page.console_logs.append(
+            f"[{msg.type}] {msg.text}"
+        ))
+        page.goto(DASHBOARD_URL)
+        page.wait_for_load_state("networkidle")
 
     yield page
 
