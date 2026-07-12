@@ -90,12 +90,4 @@ docker compose up --build
 
 Integrated Behavior-Driven Development (BDD) using pytest-bdd to support business-readable test scenarios while reusing the existing Page Object Model and Playwright fixtures. This milestone improves collaboration between technical and non-technical stakeholders by expressing automation workflows in Gherkin while preserving a single implementation layer.
 
-### 2026-07-11
-
-Improved authentication resilience across the framework. Added automatic session refresh when storage state expires during test execution, with seamless re-authentication and state syncing between worker-specific and shared storage files. Refined API cookie loading with a fallback mechanism that gracefully handles missing storage state files. Adjusted environment variable loading to respect system-level defaults.
-
-### 2026-07-10
-
-Containerized the automation framework using Docker to provide a consistent execution environment across development machines and CI pipelines. Added Docker configuration for dependency management, browser installation, and automated test execution, simplifying project setup and improving portability.
-
 More updates coming soon...
