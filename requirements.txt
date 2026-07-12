@@ -2,5 +2,6 @@ playwright
 pytest
 pytest-playwright
 pytest-xdist
+pytest-bdd
 allure-pytest
 python-dotenv
