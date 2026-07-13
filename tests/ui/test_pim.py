@@ -40,6 +40,7 @@ def test_add_employee_success(authenticated_page):
     pim.click_add_employee()
 
     pim.fill_add_employee_form(first_name="Sahil", last_name="Singh")
+    pim.set_unique_employee_id()
     pim.save_employee()
 
     assert pim.is_employee_added()
@@ -56,6 +57,7 @@ def test_add_employee_with_middle_name(authenticated_page):
     pim.fill_add_employee_form(
         first_name="Rahul", middle_name="Kumar", last_name="Verma"
     )
+    pim.set_unique_employee_id()
     pim.save_employee()
 
     assert pim.is_employee_added()
@@ -82,7 +84,7 @@ def test_search_employee_by_name(authenticated_page):
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    pim.search_by_name("Admin")
+    pim.search_by_name("Alice")
 
     assert pim.get_results_count() >= 1
 
@@ -132,13 +134,13 @@ def test_edit_employee_first_name(authenticated_page):
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    pim.search_by_name("Admin")
+    pim.search_by_name("Alice")
     pim.open_employee_by_row(0)
 
-    pim.edit_first_name("AdminEdited")
+    pim.edit_first_name("AliceEdited")
     pim.save_edit()
 
-    assert pim.get_first_name_value() == "AdminEdited"
+    assert pim.get_first_name_value() == "AliceEdited"
 
 
 @pytest.mark.regression
@@ -147,7 +149,7 @@ def test_edit_employee_save_persists(authenticated_page):
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    pim.search_by_name("Admin")
+    pim.search_by_name("Alice")
     pim.open_employee_by_row(0)
 
     pim.edit_first_name("PersistCheck")
@@ -206,6 +208,7 @@ def test_upload_profile_image(authenticated_page):
     pim.click_add_employee()
 
     pim.fill_add_employee_form(first_name="Photo", last_name="Test")
+    pim.set_unique_employee_id()
     pim.upload_profile_image(SAMPLE_IMAGE_PATH)
     pim.save_employee()
 
@@ -254,6 +257,7 @@ def test_add_employee_special_characters_in_name(authenticated_page):
     pim.click_add_employee()
 
     pim.fill_add_employee_form(first_name="@#$%^&*", last_name="!!!")
+    pim.set_unique_employee_id()
     pim.save_employee()
 
     assert pim.required_field_count() >= 1 or pim.is_employee_added()
@@ -283,6 +287,7 @@ def test_add_employee_long_name(authenticated_page):
     long_name = "A" * 100
 
     pim.fill_add_employee_form(first_name=long_name, last_name="Edge")
+    pim.set_unique_employee_id()
     pim.save_employee()
 
     assert pim.is_employee_added() or pim.required_field_count() >= 1
@@ -294,6 +299,6 @@ def test_search_leading_trailing_spaces(authenticated_page):
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    pim.search_by_name("   Admin   ")
+    pim.search_by_name("   Alice   ")
 
     assert pim.is_table_loaded()

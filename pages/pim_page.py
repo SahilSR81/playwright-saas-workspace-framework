@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from playwright.sync_api import expect
 
 from config.settings import BASE_URL
@@ -53,17 +55,13 @@ class PimPage(BasePage):
         self.search_button = page.get_by_role("button", name="Search")
         self.reset_button = page.get_by_role("button", name="Reset")
 
-        self.table_header = page.locator(".oxd-table-header")
-        self.table_rows = page.locator(".oxd-table-card")
+        self.table_body = page.locator(".oxd-table-body")
+        self.table_rows = page.locator(".oxd-table-body .oxd-table-row")
 
         self.no_records_message = page.get_by_text("No Records Found")
 
-        self.select_all_checkbox = page.locator(
-            ".oxd-table-header .oxd-checkbox-wrapper"
-        ).first
-
         self.row_checkboxes = page.locator(
-            ".oxd-table-card .oxd-checkbox-wrapper"
+            ".oxd-table-body .oxd-checkbox-wrapper"
         )
 
         self.delete_selected_button = page.get_by_role(
@@ -75,6 +73,15 @@ class PimPage(BasePage):
         )
 
         self.success_toast = page.locator(".oxd-toast-content")
+
+    # ---------- Helpers ----------
+
+    def _expand_search_filter(self):
+        toggle = self.page.locator(".oxd-icon-button").first
+        form = self.page.locator(".oxd-form").first
+        if not form.is_visible():
+            toggle.click()
+            form.wait_for(state="visible", timeout=5000)
 
     # ---------- Navigation ----------
 
@@ -110,6 +117,12 @@ class PimPage(BasePage):
 
         self.fill(self.last_name_input, last_name)
 
+    def set_unique_employee_id(self):
+        unique_id = str(uuid4().int)[:8]
+        logger.info("Setting unique Employee Id: %s", unique_id)
+        self.employee_id_input.fill("")
+        self.fill(self.employee_id_input, unique_id)
+
     def get_employee_id_value(self):
         logger.info("Reading auto-generated Employee Id")
         return self.employee_id_input.input_value()
@@ -122,12 +135,20 @@ class PimPage(BasePage):
     def is_employee_added(self):
         logger.info("Verifying employee was added (Personal Details page)")
 
-        expect(self.personal_details_heading).to_be_visible()
-
-        return True
+        try:
+            self.page.wait_for_url(
+                "**/viewPersonalDetails/**", timeout=5000
+            )
+            expect(self.personal_details_heading).to_be_visible()
+            return True
+        except Exception:
+            return False
 
     def required_field_count(self):
         logger.info("Counting required field error messages")
+        self.page.wait_for_selector(
+            ".oxd-input-field-error-message", state="visible", timeout=5000
+        )
         return self.required_messages.count()
 
     def upload_profile_image(self, file_path):
@@ -143,24 +164,31 @@ class PimPage(BasePage):
     def search_by_name(self, name=""):
         logger.info("Searching employee by name: '%s'", name)
 
-        self.fill(self.search_name_input, name)
-        self.click(self.search_button)
+        self._expand_search_filter()
 
+        self.search_name_input.click()
+        self.search_name_input.fill("")
+        self.search_name_input.press_sequentially(name, delay=50)
+        self.page.keyboard.press("Escape")
+
+        self.click(self.search_button)
         self.wait_for_page_load()
 
     def search_by_employee_id(self, employee_id=""):
         logger.info("Searching employee by id: '%s'", employee_id)
 
+        self._expand_search_filter()
+
         self.fill(self.search_id_input, employee_id)
         self.click(self.search_button)
-
         self.wait_for_page_load()
 
     def reset_search(self):
         logger.info("Resetting employee search filters")
 
-        self.click(self.reset_button)
+        self._expand_search_filter()
 
+        self.click(self.reset_button)
         self.wait_for_page_load()
 
     def get_results_count(self):
@@ -168,9 +196,9 @@ class PimPage(BasePage):
         return self.table_rows.count()
 
     def is_table_loaded(self):
-        logger.info("Checking employee table header")
+        logger.info("Checking employee table body")
 
-        expect(self.table_header).to_be_visible()
+        expect(self.table_body).to_be_visible()
 
         return True
 

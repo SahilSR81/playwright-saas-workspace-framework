@@ -23,6 +23,7 @@ env/
 # Playwright
 playwright-report/
 test-results/
+.playwright-mcp
 
 # Allure
 tests/ui/reports/allure-results/*
