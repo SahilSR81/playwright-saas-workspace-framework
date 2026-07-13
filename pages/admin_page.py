@@ -52,7 +52,9 @@ class AdminPage(BasePage):
     def _expand_search_filter(self):
         form = self.page.locator(".oxd-form").first
         if not form.is_visible():
-            toggle = self.page.locator(".oxd-icon-button").nth(1)
+            toggle = self.page.locator(
+                ".oxd-table-filter-header-options .oxd-icon-button"
+            )
             toggle.click()
             form.wait_for(state="visible", timeout=5000)
 

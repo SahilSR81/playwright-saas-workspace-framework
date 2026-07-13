@@ -56,7 +56,7 @@ class PimPage(BasePage):
         self.reset_button = page.get_by_role("button", name="Reset")
 
         self.table = page.locator(".oxd-table")
-        self.table_rows = page.locator(".oxd-table-body .oxd-table-row")
+        self.table_rows = page.locator(".oxd-table-body .oxd-table-card")
 
         self.no_records_message = page.locator(
             ".orangehrm-paper-container span.oxd-text--span",
@@ -80,7 +80,9 @@ class PimPage(BasePage):
     # ---------- Helpers ----------
 
     def _expand_search_filter(self):
-        toggle = self.page.locator(".oxd-icon-button").first
+        toggle = self.page.locator(
+            ".oxd-table-filter-header-options .oxd-icon-button"
+        )
         form = self.page.locator(".oxd-form").first
         if not form.is_visible():
             toggle.click()
@@ -121,7 +123,7 @@ class PimPage(BasePage):
         self.fill(self.last_name_input, last_name)
 
     def set_unique_employee_id(self):
-        unique_id = str(uuid4().int)[:8]
+        unique_id = f"{uuid4().int % 10**10:010d}"
         logger.info("Setting unique Employee Id: %s", unique_id)
         self.employee_id_input.fill("")
         self.fill(self.employee_id_input, unique_id)
@@ -180,7 +182,17 @@ class PimPage(BasePage):
             self.page.locator(
                 ".oxd-autocomplete-dropdown"
             ).wait_for(state="visible", timeout=5000)
+            self.page.wait_for_function(
+                """() => {
+                    const opts = document.querySelectorAll('.oxd-autocomplete-option');
+                    if (!opts.length) return false;
+                    const text = opts[0].textContent.trim();
+                    return text !== 'Searching....' && text !== 'No Records Found';
+                }""",
+                timeout=10000,
+            )
             self.page.locator(".oxd-autocomplete-option").first.click()
+            self.page.wait_for_timeout(300)
         except Exception:
             pass
 
@@ -203,6 +215,18 @@ class PimPage(BasePage):
 
         self.click(self.reset_button)
         self.wait_for_page_load()
+        try:
+            self.page.wait_for_function(
+                """() => {
+                    const body = document.querySelector('.oxd-table-body');
+                    if (!body) return false;
+                    return body.querySelectorAll('.oxd-table-card').length > 0 ||
+                           body.querySelectorAll('.oxd-table-row').length > 0;
+                }""",
+                timeout=8000,
+            )
+        except Exception:
+            pass
 
     def get_results_count(self):
         logger.info("Counting employee search results")
