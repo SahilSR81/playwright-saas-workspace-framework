@@ -84,7 +84,7 @@ def test_search_employee_by_name(authenticated_page):
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    pim.search_by_name("Sahil")
+    pim.search_by_name("Amelia")
 
     assert pim.get_results_count() >= 1
 
@@ -305,6 +305,6 @@ def test_search_leading_trailing_spaces(authenticated_page):
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    pim.search_by_name("   Sahil   ")
+    pim.search_by_name("   Amelia   ")
 
     assert pim.is_table_loaded()
