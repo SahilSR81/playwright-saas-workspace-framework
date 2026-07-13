@@ -1,4 +1,5 @@
 import os
+import time
 
 import pytest
 
@@ -7,6 +8,10 @@ from pages.pim_page import PimPage
 
 SAMPLE_IMAGE_PATH = os.path.join("data", "sample_profile.jpg")
 SAMPLE_INVALID_FILE_PATH = os.path.join("data", "sample_invalid.txt")
+
+
+def _unique_prefix():
+    return f"Emp{int(time.time()) % 100000}"
 
 
 # ---------- Happy Path: Add Employee ----------
@@ -83,15 +88,15 @@ def test_search_employee_by_name(authenticated_page):
 
     pim = PimPage(authenticated_page)
 
+    prefix = _unique_prefix()
     pim.navigate()
-    pim.search_by_employee_id("0001")
-    pim.open_employee_by_row(0)
-
-    first_name = pim.first_name_input.input_value()
-    last_name = pim.last_name_input.input_value()
+    pim.click_add_employee()
+    pim.fill_add_employee_form(first_name=prefix, last_name="Search")
+    pim.set_unique_employee_id()
+    pim.save_employee()
 
     pim.navigate()
-    pim.search_by_name(first_name)
+    pim.search_by_name(prefix)
 
     assert pim.get_results_count() >= 1
 
@@ -140,8 +145,15 @@ def test_edit_employee_first_name(authenticated_page):
 
     pim = PimPage(authenticated_page)
 
+    prefix = _unique_prefix()
     pim.navigate()
-    pim.search_by_employee_id("0001")
+    pim.click_add_employee()
+    pim.fill_add_employee_form(first_name=prefix, last_name="Edit")
+    pim.set_unique_employee_id()
+    pim.save_employee()
+
+    pim.navigate()
+    pim.search_by_name(prefix)
     pim.open_employee_by_row(0)
 
     pim.edit_first_name("Edited")
@@ -155,8 +167,15 @@ def test_edit_employee_save_persists(authenticated_page):
 
     pim = PimPage(authenticated_page)
 
+    prefix = _unique_prefix()
     pim.navigate()
-    pim.search_by_employee_id("0001")
+    pim.click_add_employee()
+    pim.fill_add_employee_form(first_name=prefix, last_name="Persist")
+    pim.set_unique_employee_id()
+    pim.save_employee()
+
+    pim.navigate()
+    pim.search_by_name(prefix)
     pim.open_employee_by_row(0)
 
     pim.edit_first_name("PersistCheck")
@@ -305,13 +324,14 @@ def test_search_leading_trailing_spaces(authenticated_page):
 
     pim = PimPage(authenticated_page)
 
+    prefix = _unique_prefix()
     pim.navigate()
-    pim.search_by_employee_id("0001")
-    pim.open_employee_by_row(0)
-
-    first_name = pim.first_name_input.input_value()
+    pim.click_add_employee()
+    pim.fill_add_employee_form(first_name=prefix, last_name="Space")
+    pim.set_unique_employee_id()
+    pim.save_employee()
 
     pim.navigate()
-    pim.search_by_name(f"   {first_name}   ")
+    pim.search_by_name(f"   {prefix}   ")
 
     assert pim.is_table_loaded()
