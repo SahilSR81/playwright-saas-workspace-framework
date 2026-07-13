@@ -232,13 +232,15 @@ class PimPage(BasePage):
     def get_first_employee_name(self):
         logger.info("Reading first employee name from table")
         return self.page.evaluate("""() => {
-            const row = document.querySelector('.oxd-table-body .oxd-table-card');
-            if (!row) return '';
-            const cells = row.querySelectorAll('.oxd-table-cell');
-            const first = cells[2] ? cells[2].textContent.trim() : '';
-            const middle = cells[3] ? cells[3].textContent.trim() : '';
-            const last = cells[4] ? cells[4].textContent.trim() : '';
-            return (first + ' ' + middle + ' ' + last).trim();
+            const rows = document.querySelectorAll('.oxd-table-body .oxd-table-card');
+            for (const row of rows) {
+                const dataCells = row.querySelectorAll('.oxd-table-card-cell .data');
+                const first = dataCells[1] ? dataCells[1].textContent.trim() : '';
+                const last = dataCells[2] ? dataCells[2].textContent.trim() : '';
+                const full = (first + ' ' + last).trim();
+                if (full && /^[A-Za-z ]+$/.test(full)) return full;
+            }
+            return '';
         }""")
 
     def get_first_employee_id(self):
@@ -246,8 +248,8 @@ class PimPage(BasePage):
         return self.page.evaluate("""() => {
             const row = document.querySelector('.oxd-table-body .oxd-table-card');
             if (!row) return '';
-            const cells = row.querySelectorAll('.oxd-table-cell');
-            return cells[1] ? cells[1].textContent.trim() : '';
+            const dataCells = row.querySelectorAll('.oxd-table-card-cell .data');
+            return dataCells[0] ? dataCells[0].textContent.trim() : '';
         }""")
 
     def is_table_loaded(self):
