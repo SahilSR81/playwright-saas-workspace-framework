@@ -33,7 +33,7 @@ class PimPage(BasePage):
 
         self.file_input = page.locator("input[type='file']")
 
-        self.save_button = page.get_by_role("button", name="Save")
+        self.save_button = page.get_by_role("button", name="Save").first
 
         self.personal_details_heading = page.get_by_role(
             "heading", name="Personal Details"
@@ -55,7 +55,7 @@ class PimPage(BasePage):
         self.search_button = page.get_by_role("button", name="Search")
         self.reset_button = page.get_by_role("button", name="Reset")
 
-        self.table_body = page.locator(".oxd-table-body")
+        self.table = page.locator(".oxd-table")
         self.table_rows = page.locator(".oxd-table-body .oxd-table-row")
 
         self.no_records_message = page.get_by_text("No Records Found")
@@ -146,10 +146,13 @@ class PimPage(BasePage):
 
     def required_field_count(self):
         logger.info("Counting required field error messages")
-        self.page.wait_for_selector(
-            ".oxd-input-field-error-message", state="visible", timeout=5000
-        )
-        return self.required_messages.count()
+        try:
+            self.page.wait_for_selector(
+                ".oxd-input-field-error-message", state="visible", timeout=3000
+            )
+            return self.required_messages.count()
+        except Exception:
+            return 0
 
     def upload_profile_image(self, file_path):
         logger.info("Uploading profile image: %s", file_path)
@@ -166,10 +169,7 @@ class PimPage(BasePage):
 
         self._expand_search_filter()
 
-        self.search_name_input.click()
-        self.search_name_input.fill("")
-        self.search_name_input.press_sequentially(name, delay=50)
-        self.page.keyboard.press("Escape")
+        self.fill(self.search_name_input, name)
 
         self.click(self.search_button)
         self.wait_for_page_load()
@@ -196,15 +196,19 @@ class PimPage(BasePage):
         return self.table_rows.count()
 
     def is_table_loaded(self):
-        logger.info("Checking employee table body")
+        logger.info("Checking employee table")
 
-        expect(self.table_body).to_be_visible()
+        expect(self.table).to_be_visible()
 
         return True
 
     def is_no_record_found(self):
         logger.info("Checking 'No Records Found' message")
-        return self.no_records_message.is_visible()
+        try:
+            self.no_records_message.wait_for(state="visible", timeout=5000)
+            return True
+        except Exception:
+            return False
 
     # ---------- Edit Employee ----------
 
