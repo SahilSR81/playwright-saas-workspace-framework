@@ -232,13 +232,25 @@ class PimPage(BasePage):
     def get_first_employee_name(self):
         logger.info("Reading first employee name from table")
         return self.page.evaluate("""() => {
-            const rows = document.querySelectorAll('.oxd-table-body .oxd-table-card');
-            for (const row of rows) {
-                const dataCells = row.querySelectorAll('.oxd-table-card-cell .data');
-                const first = dataCells[1] ? dataCells[1].textContent.trim() : '';
-                const last = dataCells[2] ? dataCells[2].textContent.trim() : '';
+            const body = document.querySelector('.oxd-table-body');
+            if (!body) return '';
+            for (const row of body.querySelectorAll('.oxd-table-row')) {
+                const cells = row.querySelectorAll('.oxd-table-cell');
+                if (cells.length < 4) continue;
+                const c2 = cells[2] ? cells[2].querySelector('.data') : null;
+                const c3 = cells[3] ? cells[3].querySelector('.data') : null;
+                const first = c2 ? c2.textContent.trim() : '';
+                const last = c3 ? c3.textContent.trim() : '';
                 const full = (first + ' ' + last).trim();
-                if (full && /^[A-Za-z ]+$/.test(full)) return full;
+                if (full.length >= 2 && /[A-Za-z]/.test(full)) return full;
+            }
+            for (const row of body.querySelectorAll('.oxd-table-card')) {
+                const dc = row.querySelectorAll('.oxd-table-card-cell .data');
+                if (dc.length < 3) continue;
+                const first = dc[1] ? dc[1].textContent.trim() : '';
+                const last = dc[2] ? dc[2].textContent.trim() : '';
+                const full = (first + ' ' + last).trim();
+                if (full.length >= 2 && /[A-Za-z]/.test(full)) return full;
             }
             return '';
         }""")
