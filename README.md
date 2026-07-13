@@ -31,7 +31,7 @@ This repository contains an enterprise-grade test automation framework built wit
 * ✅ Parallel execution
 * ✅ Docker support
 * ✅ BDD integration
-* ⬜ CI/CD pipeline
+* ✅ CI/CD pipeline
 
 ## Running Tests
 
@@ -86,8 +86,10 @@ docker compose up --build
 
 ## Project Update
 
-### 2026-07-12
+### 2026-07-13
 
-Integrated Behavior-Driven Development (BDD) using pytest-bdd to support business-readable test scenarios while reusing the existing Page Object Model and Playwright fixtures. This milestone improves collaboration between technical and non-technical stakeholders by expressing automation workflows in Gherkin while preserving a single implementation layer.
+Completed the initial CI/CD pipeline by integrating GitHub Actions for automated test execution. The workflow installs project dependencies, configures Playwright, executes UI, API, and BDD test suites, and publishes Allure artifacts to support continuous validation and faster feedback on every code change.
+
+The framework now delivers an end-to-end automation solution covering UI testing, API testing, hybrid validation, BDD, reporting, containerized execution, and continuous integration.
 
 More updates coming soon...
