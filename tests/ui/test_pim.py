@@ -84,8 +84,14 @@ def test_search_employee_by_name(authenticated_page):
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    name = pim.get_first_employee_name()
-    pim.search_by_name(name)
+    pim.search_by_employee_id("0001")
+    pim.open_employee_by_row(0)
+
+    first_name = pim.first_name_input.input_value()
+    last_name = pim.last_name_input.input_value()
+
+    pim.navigate()
+    pim.search_by_name(first_name)
 
     assert pim.get_results_count() >= 1
 
@@ -135,8 +141,7 @@ def test_edit_employee_first_name(authenticated_page):
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    name = pim.get_first_employee_name()
-    pim.search_by_name(name)
+    pim.search_by_employee_id("0001")
     pim.open_employee_by_row(0)
 
     pim.edit_first_name("Edited")
@@ -151,8 +156,7 @@ def test_edit_employee_save_persists(authenticated_page):
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    name = pim.get_first_employee_name()
-    pim.search_by_name(name)
+    pim.search_by_employee_id("0001")
     pim.open_employee_by_row(0)
 
     pim.edit_first_name("PersistCheck")
@@ -302,7 +306,12 @@ def test_search_leading_trailing_spaces(authenticated_page):
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    name = pim.get_first_employee_name()
-    pim.search_by_name(f"   {name}   ")
+    pim.search_by_employee_id("0001")
+    pim.open_employee_by_row(0)
+
+    first_name = pim.first_name_input.input_value()
+
+    pim.navigate()
+    pim.search_by_name(f"   {first_name}   ")
 
     assert pim.is_table_loaded()
