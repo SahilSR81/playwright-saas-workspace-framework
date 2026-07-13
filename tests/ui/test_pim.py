@@ -1,5 +1,4 @@
 import os
-import time
 
 import pytest
 
@@ -8,10 +7,6 @@ from pages.pim_page import PimPage
 
 SAMPLE_IMAGE_PATH = os.path.join("data", "sample_profile.jpg")
 SAMPLE_INVALID_FILE_PATH = os.path.join("data", "sample_invalid.txt")
-
-
-def _unique_prefix():
-    return f"Emp{int(time.time()) % 100000}"
 
 
 # ---------- Happy Path: Add Employee ----------
@@ -88,15 +83,8 @@ def test_search_employee_by_name(authenticated_page):
 
     pim = PimPage(authenticated_page)
 
-    prefix = _unique_prefix()
     pim.navigate()
-    pim.click_add_employee()
-    pim.fill_add_employee_form(first_name=prefix, last_name="Search")
-    pim.set_unique_employee_id()
-    pim.save_employee()
-
-    pim.navigate()
-    pim.search_by_name(prefix)
+    pim.search_by_name("Sahil")
 
     assert pim.get_results_count() >= 1
 
@@ -145,15 +133,8 @@ def test_edit_employee_first_name(authenticated_page):
 
     pim = PimPage(authenticated_page)
 
-    prefix = _unique_prefix()
     pim.navigate()
-    pim.click_add_employee()
-    pim.fill_add_employee_form(first_name=prefix, last_name="Edit")
-    pim.set_unique_employee_id()
-    pim.save_employee()
-
-    pim.navigate()
-    pim.search_by_name(prefix)
+    pim.search_by_employee_id("0558")
     pim.open_employee_by_row(0)
 
     pim.edit_first_name("Edited")
@@ -161,21 +142,17 @@ def test_edit_employee_first_name(authenticated_page):
 
     assert pim.get_first_name_value() == "Edited"
 
+    pim.edit_first_name("Sahil")
+    pim.save_edit()
+
 
 @pytest.mark.regression
 def test_edit_employee_save_persists(authenticated_page):
 
     pim = PimPage(authenticated_page)
 
-    prefix = _unique_prefix()
     pim.navigate()
-    pim.click_add_employee()
-    pim.fill_add_employee_form(first_name=prefix, last_name="Persist")
-    pim.set_unique_employee_id()
-    pim.save_employee()
-
-    pim.navigate()
-    pim.search_by_name(prefix)
+    pim.search_by_employee_id("0558")
     pim.open_employee_by_row(0)
 
     pim.edit_first_name("PersistCheck")
@@ -185,6 +162,9 @@ def test_edit_employee_save_persists(authenticated_page):
     pim.wait_for_page_load()
 
     assert pim.get_first_name_value() == "PersistCheck"
+
+    pim.edit_first_name("Sahil")
+    pim.save_edit()
 
 
 # ---------- Delete Employee ----------
@@ -324,14 +304,7 @@ def test_search_leading_trailing_spaces(authenticated_page):
 
     pim = PimPage(authenticated_page)
 
-    prefix = _unique_prefix()
     pim.navigate()
-    pim.click_add_employee()
-    pim.fill_add_employee_form(first_name=prefix, last_name="Space")
-    pim.set_unique_employee_id()
-    pim.save_employee()
-
-    pim.navigate()
-    pim.search_by_name(f"   {prefix}   ")
+    pim.search_by_name("   Sahil   ")
 
     assert pim.is_table_loaded()
