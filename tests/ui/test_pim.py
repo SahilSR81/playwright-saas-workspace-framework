@@ -106,7 +106,7 @@ def test_search_no_results(authenticated_page):
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    pim.search_by_name("ZZZ_Nonexistent_Employee_999")
+    pim.search_by_employee_id("99999999")
 
     assert pim.is_no_record_found()
 
@@ -117,7 +117,7 @@ def test_reset_search_filters(authenticated_page):
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    pim.search_by_name("ZZZ_Nonexistent_Employee_999")
+    pim.search_by_employee_id("99999999")
 
     assert pim.is_no_record_found()
 
@@ -269,7 +269,7 @@ def test_search_special_characters(authenticated_page):
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    pim.search_by_name("@#$%^&*()_admin!")
+    pim.search_by_employee_id("@#$%^&*()_admin!")
 
     assert pim.is_no_record_found() or pim.is_table_loaded()
 

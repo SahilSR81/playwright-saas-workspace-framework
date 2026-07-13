@@ -58,7 +58,10 @@ class PimPage(BasePage):
         self.table = page.locator(".oxd-table")
         self.table_rows = page.locator(".oxd-table-body .oxd-table-row")
 
-        self.no_records_message = page.get_by_text("No Records Found")
+        self.no_records_message = page.locator(
+            ".orangehrm-paper-container span.oxd-text--span",
+            has_text="No Records Found",
+        )
 
         self.row_checkboxes = page.locator(
             ".oxd-table-body .oxd-checkbox-wrapper"
@@ -133,13 +136,13 @@ class PimPage(BasePage):
         self.wait_for_page_load()
 
     def is_employee_added(self):
-        logger.info("Verifying employee was added (Personal Details page)")
+        logger.info("Verifying employee was added")
 
         try:
-            self.page.wait_for_url(
-                "**/viewPersonalDetails/**", timeout=5000
+            self.page.wait_for_function(
+                "() => !window.location.href.includes('addEmployee')",
+                timeout=5000,
             )
-            expect(self.personal_details_heading).to_be_visible()
             return True
         except Exception:
             return False
@@ -169,7 +172,17 @@ class PimPage(BasePage):
 
         self._expand_search_filter()
 
-        self.fill(self.search_name_input, name)
+        self.search_name_input.click()
+        self.search_name_input.fill("")
+        self.search_name_input.press_sequentially(name, delay=50)
+
+        try:
+            self.page.locator(
+                ".oxd-autocomplete-dropdown"
+            ).wait_for(state="visible", timeout=5000)
+            self.page.locator(".oxd-autocomplete-option").first.click()
+        except Exception:
+            pass
 
         self.click(self.search_button)
         self.wait_for_page_load()

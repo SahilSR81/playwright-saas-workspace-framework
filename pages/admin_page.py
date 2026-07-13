@@ -49,6 +49,13 @@ class AdminPage(BasePage):
         super().navigate(ADMIN_URL)
         self.wait_for_page_load()
 
+    def _expand_search_filter(self):
+        form = self.page.locator(".oxd-form").first
+        if not form.is_visible():
+            toggle = self.page.locator(".oxd-icon-button").nth(1)
+            toggle.click()
+            form.wait_for(state="visible", timeout=5000)
+
     def is_admin_page_loaded(self):
         logger.info("Checking System Users page heading")
 
@@ -73,6 +80,8 @@ class AdminPage(BasePage):
     def search_user(self, username=""):
         logger.info("Searching user: '%s'", username)
 
+        self._expand_search_filter()
+
         self.fill(self.username_input, username)
         self.click(self.search_button)
 
@@ -80,6 +89,8 @@ class AdminPage(BasePage):
 
     def reset(self):
         logger.info("Resetting search filters")
+
+        self._expand_search_filter()
 
         self.click(self.reset_button)
 
