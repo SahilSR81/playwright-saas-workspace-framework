@@ -84,7 +84,8 @@ def test_search_employee_by_name(authenticated_page):
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    pim.search_by_name("Alice")
+    name = pim.get_first_employee_name()
+    pim.search_by_name(name)
 
     assert pim.get_results_count() >= 1
 
@@ -134,13 +135,14 @@ def test_edit_employee_first_name(authenticated_page):
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    pim.search_by_name("Alice")
+    name = pim.get_first_employee_name()
+    pim.search_by_name(name)
     pim.open_employee_by_row(0)
 
-    pim.edit_first_name("AliceEdited")
+    pim.edit_first_name("Edited")
     pim.save_edit()
 
-    assert pim.get_first_name_value() == "AliceEdited"
+    assert pim.get_first_name_value() == "Edited"
 
 
 @pytest.mark.regression
@@ -149,7 +151,8 @@ def test_edit_employee_save_persists(authenticated_page):
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    pim.search_by_name("Alice")
+    name = pim.get_first_employee_name()
+    pim.search_by_name(name)
     pim.open_employee_by_row(0)
 
     pim.edit_first_name("PersistCheck")
@@ -299,6 +302,7 @@ def test_search_leading_trailing_spaces(authenticated_page):
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    pim.search_by_name("   Alice   ")
+    name = pim.get_first_employee_name()
+    pim.search_by_name(f"   {name}   ")
 
     assert pim.is_table_loaded()

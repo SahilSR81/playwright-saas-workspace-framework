@@ -141,10 +141,7 @@ class PimPage(BasePage):
         logger.info("Verifying employee was added")
 
         try:
-            self.page.wait_for_function(
-                "() => !window.location.href.includes('addEmployee')",
-                timeout=5000,
-            )
+            self.page.wait_for_url("**/viewPersonalDetails/**", timeout=10000)
             return True
         except Exception:
             return False
@@ -231,6 +228,27 @@ class PimPage(BasePage):
     def get_results_count(self):
         logger.info("Counting employee search results")
         return self.table_rows.count()
+
+    def get_first_employee_name(self):
+        logger.info("Reading first employee name from table")
+        return self.page.evaluate("""() => {
+            const row = document.querySelector('.oxd-table-body .oxd-table-card');
+            if (!row) return '';
+            const cells = row.querySelectorAll('.oxd-table-cell');
+            const first = cells[2] ? cells[2].textContent.trim() : '';
+            const middle = cells[3] ? cells[3].textContent.trim() : '';
+            const last = cells[4] ? cells[4].textContent.trim() : '';
+            return (first + ' ' + middle + ' ' + last).trim();
+        }""")
+
+    def get_first_employee_id(self):
+        logger.info("Reading first employee ID from table")
+        return self.page.evaluate("""() => {
+            const row = document.querySelector('.oxd-table-body .oxd-table-card');
+            if (!row) return '';
+            const cells = row.querySelectorAll('.oxd-table-cell');
+            return cells[1] ? cells[1].textContent.trim() : '';
+        }""")
 
     def is_table_loaded(self):
         logger.info("Checking employee table")

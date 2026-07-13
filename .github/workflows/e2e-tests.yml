@@ -7,12 +7,14 @@ on:
     paths-ignore:
       - "README.md"
       - "**/*.md"
+      - ".gitignore"
   pull_request:
     branches:
       - main
     paths-ignore:
       - "README.md"
       - "**/*.md"
+      - ".gitignore"
 
 jobs:
   e2e-tests:
@@ -21,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Python
         uses: actions/setup-python@v5
