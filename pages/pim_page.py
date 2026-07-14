@@ -2,7 +2,7 @@ from uuid import uuid4
 
 from playwright.sync_api import expect
 
-from config.settings import BASE_URL
+from config.settings import BASE_URL, TIMEOUT
 from pages.base_page import BasePage
 from utils.logger import logger
 
@@ -108,6 +108,7 @@ class PimPage(BasePage):
         logger.info("Clicking Add Employee button")
         self.click(self.add_button)
         self.wait_for_page_load()
+        self.first_name_input.wait_for(state="visible", timeout=TIMEOUT)
 
     def fill_add_employee_form(self, first_name, last_name, middle_name=""):
         logger.info(
@@ -115,6 +116,7 @@ class PimPage(BasePage):
             first_name, middle_name, last_name,
         )
 
+        self.first_name_input.wait_for(state="visible", timeout=TIMEOUT)
         self.fill(self.first_name_input, first_name)
 
         if middle_name:
@@ -178,7 +180,7 @@ class PimPage(BasePage):
         try:
             self.page.locator(
                 ".oxd-autocomplete-dropdown"
-            ).wait_for(state="visible", timeout=5000)
+            ).wait_for(state="visible", timeout=8000)
             self.page.wait_for_function(
                 """() => {
                     const opts = document.querySelectorAll('.oxd-autocomplete-option');
@@ -186,15 +188,22 @@ class PimPage(BasePage):
                     const text = opts[0].textContent.trim();
                     return text !== 'Searching....' && text !== 'No Records Found';
                 }""",
-                timeout=10000,
+                timeout=12000,
             )
             self.page.locator(".oxd-autocomplete-option").first.click()
-            self.page.wait_for_timeout(300)
+            self.page.wait_for_timeout(500)
         except Exception:
-            pass
+            logger.warning(
+                "Autocomplete dropdown did not yield a selectable option for '%s'; "
+                "falling back to raw text search",
+                name,
+            )
+            self.search_name_input.fill("")
+            self.search_name_input.type(name)
 
         self.click(self.search_button)
         self.wait_for_page_load()
+        self.page.wait_for_timeout(1000)
 
     def search_by_employee_id(self, employee_id=""):
         logger.info("Searching employee by id: '%s'", employee_id)
@@ -227,7 +236,37 @@ class PimPage(BasePage):
 
     def get_results_count(self):
         logger.info("Counting employee search results")
-        return self.table_rows.count()
+        count = self.table_rows.count()
+        if count > 0:
+            return count
+        alt = self.page.locator(
+            ".oxd-table-body .oxd-table-row:not(.oxd-table-header-row)"
+        )
+        alt_count = alt.count()
+        if alt_count > 0:
+            return alt_count
+        return 0
+
+    def wait_for_search_results(self, timeout=30000):
+        logger.info("Waiting for search results to appear (timeout=%sms)", timeout)
+        self.page.wait_for_function(
+            """() => {
+                const rows = document.querySelectorAll(
+                    '.oxd-table-body .oxd-table-card'
+                );
+                if (rows.length > 0) return true;
+                const altRows = document.querySelectorAll(
+                    '.oxd-table-body .oxd-table-row:not(.oxd-table-header-row)'
+                );
+                if (altRows.length > 0) return true;
+                const noRec = document.querySelector(
+                    '.orangehrm-paper-container span.oxd-text--span'
+                );
+                if (noRec && noRec.textContent.includes('No Records Found')) return true;
+                return false;
+            }""",
+            timeout=timeout,
+        )
 
     def get_first_employee_name(self):
         logger.info("Reading first employee name from table")

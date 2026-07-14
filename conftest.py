@@ -1,11 +1,13 @@
 import os
 import platform
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
 
 import pytest
 from playwright.sync_api import sync_playwright
+from playwright._impl._errors import TimeoutError as PlaywrightTimeout
 
 from config.settings import (
     BASE_URL,
@@ -15,6 +17,7 @@ from config.settings import (
     HEADLESS,
     PARALLEL_WORKERS,
     SLOW_MO,
+    TIMEOUT,
 )
 from pages.login_page import LoginPage
 from utils.logger import logger
@@ -34,6 +37,24 @@ def _get_worker_id():
 def _get_worker_auth_path(worker_id):
     AUTH_DIR.mkdir(parents=True, exist_ok=True)
     return AUTH_DIR / f"{worker_id}.json"
+
+
+def _navigate_with_retry(page, url, attempts=3, backoff_seconds=2):
+    for attempt in range(1, attempts + 1):
+        try:
+            logger.info("Navigating to %s (attempt %d/%d)", url, attempt, attempts)
+            page.goto(url, wait_until="domcontentloaded", timeout=TIMEOUT)
+            return
+        except PlaywrightTimeout:
+            if attempt == attempts:
+                logger.error("Navigation failed after %d attempts: %s", attempts, url)
+                raise
+            wait = backoff_seconds * attempt
+            logger.warning(
+                "Navigation timeout on attempt %d/%d, retrying in %ds: %s",
+                attempt, attempts, wait, url,
+            )
+            time.sleep(wait)
 
 
 @pytest.fixture(scope="session")
@@ -68,6 +89,8 @@ def context(browser):
     logger.info("Creating browser context")
 
     context = browser.new_context()
+    context.set_default_navigation_timeout(TIMEOUT)
+    context.set_default_timeout(TIMEOUT)
     context.tracing.start(screenshots=True, snapshots=True)
 
     yield context
@@ -101,10 +124,12 @@ def page(context):
 def _perform_login(browser, auth_path):
     """Helper: perform a fresh login, save storage state, return (context, page)."""
     context = browser.new_context()
+    context.set_default_navigation_timeout(TIMEOUT)
+    context.set_default_timeout(TIMEOUT)
     page = context.new_page()
 
     login_page = LoginPage(page)
-    login_page.navigate()
+    _navigate_with_retry(page, BASE_URL)
     login_page.login()
 
     context.storage_state(path=str(auth_path))
@@ -154,6 +179,8 @@ def authenticated_page(browser, auth_storage_state):
     logger.info("Launching authenticated browser context using cached storage state")
 
     context = browser.new_context(storage_state=str(auth_path))
+    context.set_default_navigation_timeout(TIMEOUT)
+    context.set_default_timeout(TIMEOUT)
     context.tracing.start(screenshots=True, snapshots=True)
     page = context.new_page()
     page.console_logs = []
@@ -161,7 +188,7 @@ def authenticated_page(browser, auth_storage_state):
         f"[{msg.type}] {msg.text}"
     ))
 
-    page.goto(DASHBOARD_URL)
+    _navigate_with_retry(page, DASHBOARD_URL)
     page.wait_for_load_state("networkidle")
 
     if "/auth/login" in page.url.lower():
@@ -173,13 +200,15 @@ def authenticated_page(browser, auth_storage_state):
         new_context.close()
 
         context = browser.new_context(storage_state=str(auth_path))
+        context.set_default_navigation_timeout(TIMEOUT)
+        context.set_default_timeout(TIMEOUT)
         context.tracing.start(screenshots=True, snapshots=True)
         page = context.new_page()
         page.console_logs = []
         page.on("console", lambda msg: page.console_logs.append(
             f"[{msg.type}] {msg.text}"
         ))
-        page.goto(DASHBOARD_URL)
+        _navigate_with_retry(page, DASHBOARD_URL)
         page.wait_for_load_state("networkidle")
 
     yield page

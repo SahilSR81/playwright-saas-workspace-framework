@@ -3,5 +3,6 @@ pytest
 pytest-playwright
 pytest-xdist
 pytest-bdd
+pytest-rerunfailures
 allure-pytest
 python-dotenv

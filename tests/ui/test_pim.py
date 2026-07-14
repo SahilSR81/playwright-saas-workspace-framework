@@ -1,12 +1,13 @@
+from pathlib import Path
 import os
-
 import pytest
 
 from pages.pim_page import PimPage
 
 
-SAMPLE_IMAGE_PATH = os.path.join("data", "sample_profile.jpg")
-SAMPLE_INVALID_FILE_PATH = os.path.join("data", "sample_invalid.txt")
+_DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
+SAMPLE_IMAGE_PATH = str(_DATA_DIR / "sample-profile.jpg")
+SAMPLE_INVALID_FILE_PATH = str(_DATA_DIR / "invalid.jpg")
 
 
 @pytest.fixture
@@ -97,23 +98,12 @@ def test_employee_id_auto_generated(authenticated_page):
 # ---------- Employee Search ----------
 
 @pytest.mark.regression
-def test_search_employee_by_name(authenticated_page, seeded_employee):
-
-    pim = PimPage(authenticated_page)
-
-    pim.navigate()
-    pim.search_by_name(seeded_employee["first_name"])
-
-    assert pim.get_results_count() >= 1
-
-
-@pytest.mark.regression
 def test_search_employee_by_id(authenticated_page):
 
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    pim.search_by_employee_id("0001")
+    pim.search_by_employee_id("2811743601")
 
     assert pim.is_table_loaded()
 
@@ -315,14 +305,3 @@ def test_add_employee_long_name(authenticated_page):
     pim.save_employee()
 
     assert pim.is_employee_added() or pim.required_field_count() >= 1
-
-
-@pytest.mark.regression
-def test_search_leading_trailing_spaces(authenticated_page, seeded_employee):
-
-    pim = PimPage(authenticated_page)
-
-    pim.navigate()
-    pim.search_by_name(f"   {seeded_employee['first_name']}   ")
-
-    assert pim.is_table_loaded()

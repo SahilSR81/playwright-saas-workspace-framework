@@ -1,14 +1,34 @@
+import time
+
 from playwright.sync_api import expect
+from playwright._impl._errors import TimeoutError as PlaywrightTimeout
+
+from config.settings import TIMEOUT
 from utils.logger import logger
+
+
 class BasePage:
 
     def __init__(self, page):
         self.page = page
         logger.info("BasePage initialized")
 
-    def navigate(self, url):
-        logger.info("Navigating to %s", url)
-        self.page.goto(url)
+    def navigate(self, url, attempts=3, backoff_seconds=2):
+        for attempt in range(1, attempts + 1):
+            try:
+                logger.info("Navigating to %s (attempt %d/%d)", url, attempt, attempts)
+                self.page.goto(url, wait_until="domcontentloaded", timeout=TIMEOUT)
+                return
+            except PlaywrightTimeout:
+                if attempt == attempts:
+                    logger.error("Navigation failed after %d attempts: %s", attempts, url)
+                    raise
+                wait = backoff_seconds * attempt
+                logger.warning(
+                    "Navigation timeout on attempt %d/%d, retrying in %ds: %s",
+                    attempt, attempts, wait, url,
+                )
+                time.sleep(wait)
 
     def get_title(self):
         logger.info("Getting page title")
