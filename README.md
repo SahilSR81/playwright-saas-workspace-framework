@@ -10,35 +10,63 @@
 
 End-to-end test automation framework for the [OrangeHRM](https://opensource-demo.orangehrmlive.com) open-source HR application. Covers UI validation, API testing, hybrid UI+API flows, and BDD scenarios using Playwright, Pytest, and Allure reporting.
 
+---
+
+## Test Coverage
+
+```
+72 test cases | 9 modules | 100% passing
+```
+
+| Module | Tests | What's Covered |
+|--------|------:|----------------|
+| Login | 9 | Valid/invalid credentials, empty fields, whitespace, case sensitivity |
+| Dashboard | 5 | Page load, URL, side nav, quick launch, widgets (time at work, my actions) |
+| Admin | 16 | System Users page, table, search (valid/invalid/special chars/long/rapid), filters, reset, case sensitivity |
+| PIM | 19 | Add/edit/delete employees, search by ID, file upload, empty fields, special chars, long names |
+| Logout | 5 | Logout option visibility, successful logout, redirect, session invalidation, refresh after logout |
+| API (Base) | 4 | Session creation, default headers, base URL, session close |
+| API (Employee) | 6 | Endpoint hit, create payload, custom employee ID, employee API object, get all, create employee |
+| Network | 6 | Block images, block CSS, mock 500, mock employee API, offline mode, restore network |
+| BDD | 2 | Feature files with step definitions (login, admin) |
+
+---
+
 ## Key Features
 
-| Feature | Description |
-|---------|-------------|
-| Page Object Model | Page objects in `pages/` encapsulate locators and interactions for each application view |
-| API Layer | Standalone API client classes in `api/` for direct HTTP validation against the application |
-| Hybrid Tests | UI + API tests that verify data consistency across the browser and REST interface |
-| BDD Support | Gherkin feature files in `features/` with step definitions via pytest-bdd |
-| Network Interception | Playwright route mocking and request interception for API stubbing and header injection |
-| Parallel Execution | pytest-xdist distributes tests across multiple workers with per-worker storage state isolation |
-| CI Retry Resilience | GitHub Actions reruns flaky tests once with a 5-second delay before marking failure |
-| Allure Reporting | Rich test reports with environment properties, screenshots, HTML snapshots, traces, and custom failure categorization |
-| Docker Support | Containerized test execution for consistent local runs regardless of host environment |
-| GitHub Actions CI | Automated pipeline on push/PR to main with artifact upload and 30-day retention |
+| Area | What's implemented |
+|------|-------------------|
+| UI Automation | Page Object Model across Login, Dashboard, Admin, PIM, and Logout modules |
+| API Testing | requests-based API layer (BaseAPI, EmployeeAPI) with session/cookie reuse from browser auth |
+| Hybrid Tests | Tests that validate the same state through both the UI and the API |
+| BDD Support | pytest-bdd feature files (`features/*.feature`) with step definitions |
+| Network Interception | Request blocking/mocking helper to simulate broken images, CSS, and server errors |
+| Parallel Execution | pytest-xdist with a worker-isolated auth storage state per xdist worker |
+| CI Resilience | Automatic retry (pytest-rerunfailures) + `domcontentloaded`-based navigation to handle a shared public demo instance gracefully |
+| Reporting | Allure reports with a custom `categories.json` that auto-buckets failures (Locator / Timeout / Assertion / Network / API) |
+| Containerized | Fully Dockerized execution via Dockerfile + docker-compose.yml |
+| CI/CD | GitHub Actions workflow running on every push/PR to main |
+
+---
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Browser Automation | Playwright |
+| Language | Python 3.12 |
+| Browser Automation | Playwright (sync API) |
 | Test Runner | Pytest |
 | BDD | pytest-bdd |
-| Parallel Execution | pytest-xdist |
-| Retry Logic | pytest-rerunfailures |
-| Reporting | Allure Report (allure-pytest) |
-| Configuration | python-dotenv |
+| API Client | requests |
+| Parallelization | pytest-xdist |
+| CI Resilience | pytest-rerunfailures |
+| Reporting | Allure (allure-pytest) |
+| Config Management | python-dotenv |
+| Containerization | Docker + Docker Compose |
 | CI/CD | GitHub Actions |
-| Containerization | Docker, Docker Compose |
-| Language | Python 3.12 |
+| Application Under Test | [OrangeHRM](https://opensource-demo.orangehrmlive.com) (public demo) |
+
+---
 
 ## Project Structure
 
@@ -64,7 +92,7 @@ playwright-saas-workspace-framework/
 │   ├── docker-run.sh       # Docker execution helper
 │   └── run_parallel.sh     # Parallel execution wrapper
 ├── tests/
-│   ├── ui/                 # UI and integration tests
+│   ├── ui/                 # UI and integration tests (72 cases)
 │   └── bdd/
 │       └── steps/          # BDD step definitions
 ├── utils/                  # Shared helpers
@@ -79,6 +107,8 @@ playwright-saas-workspace-framework/
 ├── pytest.ini              # Pytest configuration
 └── requirements.txt
 ```
+
+---
 
 ## Getting Started
 
@@ -107,6 +137,10 @@ pip install -r requirements.txt
 playwright install --with-deps chromium
 ```
 
+You're ready to run tests.
+
+---
+
 ## Configuration
 
 All settings are read from environment variables with sensible defaults. Create a `.env` file in the project root for local development (already gitignored).
@@ -123,6 +157,8 @@ All settings are read from environment variables with sensible defaults. Create 
 | `USERNAME` | `Admin` | Login credential username |
 | `PASSWORD` | `admin123` | Login credential password |
 | `PARALLEL_WORKERS` | `0` | Number of parallel workers (0 = disabled) |
+
+---
 
 ## Running Tests
 
@@ -174,14 +210,18 @@ docker compose up --build
 pytest tests/bdd/
 ```
 
+---
+
 ## Test Markers
 
-| Marker | Description | Defined In |
-|--------|-------------|------------|
-| `smoke` | Quick sanity checks for critical paths | `pytest.ini`, `conftest.py` |
-| `regression` | Full regression test suite | `pytest.ini`, `conftest.py` |
-| `api` | API-only tests | `pytest.ini`, `conftest.py` |
-| `integration` | UI + API hybrid tests | `pytest.ini`, `conftest.py` |
+| Marker | Description |
+|--------|-------------|
+| `smoke` | Quick sanity checks for critical paths |
+| `regression` | Full regression test suite |
+| `api` | API-only tests |
+| `integration` | UI + API hybrid tests |
+
+---
 
 ## Test Reporting
 
@@ -218,6 +258,8 @@ On test failure, the framework automatically attaches to the Allure report:
 - Browser console logs
 - Playwright trace file
 
+---
+
 ## CI/CD Pipeline
 
 The GitHub Actions workflow at `.github/workflows/e2e-tests.yml` runs on every push and pull request to `main`:
@@ -230,6 +272,8 @@ The GitHub Actions workflow at `.github/workflows/e2e-tests.yml` runs on every p
 6. Uploads Allure results as artifacts (30-day retention)
 
 Documentation-only changes (`**/*.md`, `.gitignore`) do not trigger the pipeline.
+
+---
 
 ## Troubleshooting
 
@@ -271,21 +315,7 @@ The CI pipeline reruns failed tests once to handle transient issues. For persist
 
 </details>
 
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, coding conventions, and pull request guidelines.
-
-## Code of Conduct
-
-This project follows the [Contributor Covenant v2.1](CODE_OF_CONDUCT.md).
-
-## Security
-
-See [SECURITY.md](SECURITY.md) for reporting guidelines.
-
-## License
-
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+---
 
 ## Author
 
