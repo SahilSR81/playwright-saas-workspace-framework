@@ -12,26 +12,6 @@ End-to-end test automation framework for the [OrangeHRM](https://opensource-demo
 
 ---
 
-## Test Coverage
-
-```
-72 test cases | 9 modules | 100% passing
-```
-
-| Module | Tests | What's Covered |
-|--------|------:|----------------|
-| Login | 9 | Valid/invalid credentials, empty fields, whitespace, case sensitivity |
-| Dashboard | 5 | Page load, URL, side nav, quick launch, widgets (time at work, my actions) |
-| Admin | 16 | System Users page, table, search (valid/invalid/special chars/long/rapid), filters, reset, case sensitivity |
-| PIM | 19 | Add/edit/delete employees, search by ID, file upload, empty fields, special chars, long names |
-| Logout | 5 | Logout option visibility, successful logout, redirect, session invalidation, refresh after logout |
-| API (Base) | 4 | Session creation, default headers, base URL, session close |
-| API (Employee) | 6 | Endpoint hit, create payload, custom employee ID, employee API object, get all, create employee |
-| Network | 6 | Block images, block CSS, mock 500, mock employee API, offline mode, restore network |
-| BDD | 2 | Feature files with step definitions (login, admin) |
-
----
-
 ## Key Features
 
 | Area | What's implemented |
@@ -275,6 +255,26 @@ Documentation-only changes (`**/*.md`, `.gitignore`) do not trigger the pipeline
 
 ---
 
+## Test Coverage
+
+```
+72 test cases | 9 modules | 100% passing
+```
+
+| Module | Tests | What's Covered |
+|--------|------:|----------------|
+| Login | 9 | Valid/invalid credentials, empty fields, whitespace, case sensitivity |
+| Dashboard | 5 | Page load, URL, side nav, quick launch, widgets (time at work, my actions) |
+| Admin | 16 | System Users page, table, search (valid/invalid/special chars/long/rapid), filters, reset, case sensitivity |
+| PIM | 19 | Add/edit/delete employees, search by ID, file upload, empty fields, special chars, long names |
+| Logout | 5 | Logout option visibility, successful logout, redirect, session invalidation, refresh after logout |
+| API (Base) | 4 | Session creation, default headers, base URL, session close |
+| API (Employee) | 6 | Endpoint hit, create payload, custom employee ID, employee API object, get all, create employee |
+| Network | 6 | Block images, block CSS, mock 500, mock employee API, offline mode, restore network |
+| BDD | 2 | Feature files with step definitions (login, admin) |
+
+---
+
 ## Troubleshooting
 
 <details>
@@ -320,3 +320,8 @@ The CI pipeline reruns failed tests once to handle transient issues. For persist
 ## Author
 
 **Sahil Singh** -- [@SahilSR81](https://github.com/SahilSR81)
+
+---
+
+> *"The measure of a person is how they handle things when they break."*
+> -- *Roronoa Zoro, One Piece*
