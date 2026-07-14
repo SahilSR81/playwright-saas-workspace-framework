@@ -284,6 +284,7 @@ class PimPage(BasePage):
     def open_employee_by_row(self, row_index=0):
         logger.info("Opening employee at row index %s", row_index)
 
+        self.table_rows.nth(row_index).wait_for(state="visible", timeout=10000)
         self.table_rows.nth(row_index).click()
 
         self.wait_for_page_load()

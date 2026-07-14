@@ -9,6 +9,24 @@ SAMPLE_IMAGE_PATH = os.path.join("data", "sample_profile.jpg")
 SAMPLE_INVALID_FILE_PATH = os.path.join("data", "sample_invalid.txt")
 
 
+@pytest.fixture
+def seeded_employee(authenticated_page):
+    """Create a fresh employee so search/edit tests never depend on
+    pre-existing data on the shared demo instance."""
+    pim = PimPage(authenticated_page)
+
+    pim.navigate()
+    pim.click_add_employee()
+    pim.fill_add_employee_form(first_name="Amelia", last_name="QaSeed")
+    pim.set_unique_employee_id()
+    employee_id = pim.get_employee_id_value()
+    pim.save_employee()
+
+    assert pim.is_employee_added()
+
+    yield {"first_name": "Amelia", "last_name": "QaSeed", "employee_id": employee_id}
+
+
 # ---------- Happy Path: Add Employee ----------
 
 @pytest.mark.smoke
@@ -79,12 +97,12 @@ def test_employee_id_auto_generated(authenticated_page):
 # ---------- Employee Search ----------
 
 @pytest.mark.regression
-def test_search_employee_by_name(authenticated_page):
+def test_search_employee_by_name(authenticated_page, seeded_employee):
 
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    pim.search_by_name("Amelia")
+    pim.search_by_name(seeded_employee["first_name"])
 
     assert pim.get_results_count() >= 1
 
@@ -129,12 +147,12 @@ def test_reset_search_filters(authenticated_page):
 # ---------- Edit Employee ----------
 
 @pytest.mark.regression
-def test_edit_employee_first_name(authenticated_page):
+def test_edit_employee_first_name(authenticated_page, seeded_employee):
 
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    pim.search_by_employee_id("0558")
+    pim.search_by_employee_id(seeded_employee["employee_id"])
     pim.open_employee_by_row(0)
 
     pim.edit_first_name("Edited")
@@ -142,17 +160,17 @@ def test_edit_employee_first_name(authenticated_page):
 
     assert pim.get_first_name_value() == "Edited"
 
-    pim.edit_first_name("Sahil")
+    pim.edit_first_name(seeded_employee["first_name"])
     pim.save_edit()
 
 
 @pytest.mark.regression
-def test_edit_employee_save_persists(authenticated_page):
+def test_edit_employee_save_persists(authenticated_page, seeded_employee):
 
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    pim.search_by_employee_id("0558")
+    pim.search_by_employee_id(seeded_employee["employee_id"])
     pim.open_employee_by_row(0)
 
     pim.edit_first_name("PersistCheck")
@@ -163,7 +181,7 @@ def test_edit_employee_save_persists(authenticated_page):
 
     assert pim.get_first_name_value() == "PersistCheck"
 
-    pim.edit_first_name("Sahil")
+    pim.edit_first_name(seeded_employee["first_name"])
     pim.save_edit()
 
 
@@ -300,11 +318,11 @@ def test_add_employee_long_name(authenticated_page):
 
 
 @pytest.mark.regression
-def test_search_leading_trailing_spaces(authenticated_page):
+def test_search_leading_trailing_spaces(authenticated_page, seeded_employee):
 
     pim = PimPage(authenticated_page)
 
     pim.navigate()
-    pim.search_by_name("   Amelia   ")
+    pim.search_by_name(f"   {seeded_employee['first_name']}   ")
 
     assert pim.is_table_loaded()
